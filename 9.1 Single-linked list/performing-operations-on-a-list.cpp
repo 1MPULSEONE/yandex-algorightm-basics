@@ -1,103 +1,85 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
 using namespace std;
+
+struct Node
+{
+    int element;
+    Node *next;
+};
+
+struct Command
+{
+    int type;
+    int x;
+    int y;
+};
 
 int main()
 {
     int q;
     cin >> q;
 
-    struct Node
-    {
-        int element;
-        Node *next;
-    };
-
-    struct Command
-    {
-        int type;
-        int x;
-        int y;
-    };
-
     Node *head = nullptr;
-    std::vector<Command> commands;
-
-    int type,
-        x, y;
-
-    for (int i = 0; i < q;)
-    {
-        cin >> type >> x >> y;
-        Command command = {type, x, y};
-        commands.push_back(command);
-    }
+    vector<Command> commands(q);
 
     for (int i = 0; i < q; i++)
     {
-        int type = commands[i].type;
-        int x = commands[i].x;
-        int y = commands[i].y;
+        int type, x, y;
+        cin >> type >> x;
+        if (type == 1)
+            cin >> y;
+        commands[i] = {type, x, y};
+    }
 
-        cout << type << endl;
-
-        if (type == '1')
+    for (const auto &command : commands)
+    {
+        if (command.type == 1)
         {
-            if (x == 0)
+            Node *new_node = new Node{command.y, nullptr};
+            if (command.x == 0)
             {
-                Node *newNode = new Node{y, nullptr};
-                head = newNode;
+                new_node->next = head;
+                head = new_node;
             }
             else
             {
-                Node *curr = head;
-                while (curr->next != nullptr)
+                Node *current_node = head;
+                for (int i = 1; i < command.x; i++)
                 {
-                    curr = curr->next;
+                    current_node = current_node->next;
                 }
-
-                Node newNode = {y, nullptr};
-                curr->next = curr;
+                new_node->next = current_node->next;
+                current_node->next = new_node;
             }
         }
-
-        else if (type == '2')
+        else if (command.type == 2)
         {
-            Node *curr = head;
-            int count = 1;
-            while (curr->next != nullptr)
+            Node *current_node = head;
+            for (int i = 1; i < command.x; i++)
             {
-                if (count == x)
-                {
-                    break;
-                }
-                curr = curr->next;
-                count++;
+                current_node = current_node->next;
             }
-
-            cout << curr->next;
+            cout << current_node->element << endl;
         }
-
-        else if (type == '3')
+        else if (command.type == 3)
         {
-            Node *curr = head;
-            int count = 1;
-            while (curr->next != nullptr)
+            if (command.x == 1)
             {
-                if (count == x - 1)
-                {
-                    break;
-                }
-                curr = curr->next;
-                count++;
+                head = head->next;
             }
-
-            Node *elemToRemove = curr->next;
-            curr->next = elemToRemove->next;
+            else
+            {
+                Node *current_node = head;
+                for (int i = 1; i < command.x - 1; i++)
+                {
+                    current_node = current_node->next;
+                }
+                current_node->next = current_node->next->next;
+            }
         }
-
-        return 0;
     }
+
+    return 0;
 }
